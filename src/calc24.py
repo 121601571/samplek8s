@@ -1,5 +1,18 @@
-import sys, os
 import itertools
+
+
+class valStruct:
+    def __init__(self, value, valueL, valueR, operator):
+        self.value = value
+        self.valueL = valueL
+        self.operator = operator
+        self.valueR = valueR
+
+    def __repr__(self):
+        return str(self.value) + '->' + str(self.valueL) + '->' +str(self.operator) + '->' +str(self.valueR)
+
+    def __str__(self):
+        return self.__repr__()
 
 
 def yValue(a, b):
@@ -22,6 +35,25 @@ def yValue(a, b):
         yield i
 
 
+def yValueStruct(a: valStruct, b: valStruct):
+    vlist = set()
+    if type(b) == tuple:
+        b = b[0]
+    vlist.add(valStruct(value=a.value + b.value, valueL= a, valueR=b, operator='+' ))
+    vlist.add(valStruct(value=a.value - b.value, valueL=a, valueR=b, operator='-'))
+    vlist.add(valStruct(value=a.value * b.value, valueL= a, valueR=b, operator='*' ))
+    vlist.add(valStruct(value=b.value - a.value, valueL= b, valueR=a, operator='-' ))
+
+    if b.value != 0:
+        vlist.add(valStruct(value=a.value / b.value, valueL=a, valueR=b, operator='/'))
+
+    if a.value != 0:
+        vlist.add(valStruct(value=b.value / a.value, valueL=b, valueR=a, operator='/'))
+
+    for i in vlist:
+        yield i
+
+
 def getCb(ll):
     cz = len(ll) - 1
     if cz == 0:
@@ -33,17 +65,32 @@ def getCb(ll):
     res2 = itertools.combinations(tmp, 1)
     res3 = [i for i in res2]
     for k, v in enumerate(res1):
-        yield (v, res3[k])
+        yield v, res3[k]
 
-def yieldValues(ll ):
+
+def yieldValues(ll):
+    #ll list of vStruct.
     if len(ll) == 1:
         yield ll[0]
     if len(ll) == 2:
         for i in yValue(ll[0], ll[1]):
             yield i
     for tt in getCb(ll):
-        for j in yieldValues(list(tt[0])):
+        for j in yieldValues(list(tt[0])):  # j tuple(v, formula)
             for k in yValue(j, tt[1]):
+                yield k
+
+
+def yieldStructValues(ll):
+    #ll list of vStruct.
+    if len(ll) == 1:
+        yield ll[0]
+    if len(ll) == 2:
+        for i in yValueStruct(ll[0], ll[1]):
+            yield i
+    for tt in getCb(ll):
+        for j in yieldStructValues(list(tt[0])):  # j tuple(v, formula)
+            for k in yValueStruct(j, tt[1]):
                 yield k
 
 def isOK(ll, target):
@@ -52,7 +99,21 @@ def isOK(ll, target):
             return True
     return False
 
+def isStructOK(ll, target):
+    for i in yieldStructValues(ll):
+        if i.value == target:
+            return True, i
+    return False, None
+
 if __name__ == '__main__':
     pass
-    ll = [3,3,7,7]
-    print(isOK(ll,24))
+    ll = [1,2,3,4]
+    # a = valStruct(value=1, valueL=None,valueR=None,operator=None)
+    # b = valStruct(value=2, valueL=None, valueR=None, operator=None)
+    # for i in yValueStruct(a,b):
+    #     print(i)
+    # res = isOK(ll, 24)
+    # print(res)
+    a = [ valStruct(value=i, valueL=None,valueR=None,operator=None)  for i in ll]
+    ok, res = isStructOK(a, 10)
+    print(res)
