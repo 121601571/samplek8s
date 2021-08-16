@@ -9,7 +9,10 @@ class valStruct:
         self.valueR = valueR
 
     def __repr__(self):
-        return str(self.value) + '->' + str(self.valueL) + '->' +str(self.operator) + '->' +str(self.valueR)
+
+        if self.operator == None:
+            return str(self.value)
+        return '(' + str(self.valueL) + str(self.operator) + str(self.valueR) + ')'
 
     def __str__(self):
         return self.__repr__()
@@ -107,7 +110,7 @@ def isStructOK(ll, target):
 
 if __name__ == '__main__':
     pass
-    ll = [1,2,3,4]
+    ll = [3,3,7,7]
     # a = valStruct(value=1, valueL=None,valueR=None,operator=None)
     # b = valStruct(value=2, valueL=None, valueR=None, operator=None)
     # for i in yValueStruct(a,b):
@@ -115,5 +118,5 @@ if __name__ == '__main__':
     # res = isOK(ll, 24)
     # print(res)
     a = [ valStruct(value=i, valueL=None,valueR=None,operator=None)  for i in ll]
-    ok, res = isStructOK(a, 10)
+    ok, res = isStructOK(a, 24)
     print(res)
